@@ -67,17 +67,48 @@ let getWebhook = (req, res) => {
 function handleMessage(sender_psid, received_message) {
     let response;
 
-    // Check if the message contains text
     if (received_message.text) {
+        const userMessage = received_message.text.toLowerCase();
 
-        // Create the payload for a basic text message
-        response = {
-            "text": `You sent the message: "${received_message.text}". Now send me an image!`
+        // Banking-related questions
+        if (userMessage.includes("loan")) {
+            response = {
+                "text": `We offer several types of loans:
+1. Personal Loan
+2. Home Loan
+3. Car Loan
+
+Please reply with the type of loan you're interested in to know more.`
+            };
+        } else if (userMessage.includes("personal loan")) {
+            response = {
+                "text": `Our Personal Loans offer flexible repayment options and competitive interest rates. The eligibility criteria include:
+- Minimum income: $3,000/month
+- Employment stability: 1 year
+
+Would you like to apply?`
+            };
+        } else if (userMessage.includes("home loan")) {
+            response = {
+                "text": `Our Home Loans provide up to 80% financing with interest rates starting at 5%. 
+
+Would you like to learn about the documents required?`
+            };
+        } else if (userMessage.includes("car loan")) {
+            response = {
+                "text": `Our Car Loans offer up to 90% financing on new cars and 80% on used cars. 
+
+Would you like to calculate your EMI (Equated Monthly Installment)?`
+            };
+        } else {
+            // Default response for unrecognized messages
+            response = {
+                "text": `I'm sorry, I didn't understand that. You can ask me about loans, account services, or bank timings.`
+            };
         }
-    }  else if (received_message.attachments) {
-
-    // Gets the URL of the message attachment
-    let attachment_url = received_message.attachments[0].payload.url;
+    } else if (received_message.attachments) {
+        // Handle attachments
+        let attachment_url = received_message.attachments[0].payload.url;
         response = {
             "attachment": {
                 "type": "template",
@@ -103,8 +134,8 @@ function handleMessage(sender_psid, received_message) {
                 }
             }
         }
+    }
 
-}
 
 // Sends the response message
     callSendAPI(sender_psid, response);
