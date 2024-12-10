@@ -14,7 +14,8 @@ let postWebhook = (req, res) => {
         }
 
 };
-const config = require("../config.js"); // Adjust path as necessary
+const config = require("../config.js" +
+    ""); // Adjust path as necessary
 
 let getWebhook = (req, res) => {
     // Parse the query params
