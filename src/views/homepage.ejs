@@ -13,11 +13,20 @@
 <script async defer crossorigin="anonymous"
         src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v17.0&appId=327940747079105&autoLogAppEvents=1">
 </script>
+
+<!-- Messenger Chat Plugin -->
 <div class="fb-messengermessageus"
      messenger_app_id="327940747079105"
      page_id="546018548583823"
      color="blue"
      size="large">
 </div>
+
+<script>
+    // Ensure the Messenger button is initialized properly after SDK loads
+    window.onload = function() {
+        FB.XFBML.parse();
+    };
+</script>
 </body>
 </html>
