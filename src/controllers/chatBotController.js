@@ -62,46 +62,55 @@ let getWebhook = (req, res) => {
         }
     }
 };
+// Function to set up the "Get Started" button
+const setupGetStartedButton = () => {
+    const request_body = {
+        "get_started": { "payload": "GET_STARTED" }
+    };
+
+    request({
+        "uri": `https://graph.facebook.com/v6.0/me/messenger_profile?access_token=${process.env.FB_PAGE_TOKEN}`,
+        "method": "POST",
+        "json": request_body
+    }, (err, res, body) => {
+        if (!err) {
+            console.log("Get Started button setup complete!");
+        } else {
+            console.error("Unable to set Get Started button:", err);
+        }
+    });
+};
+
+// Call setup function once the bot starts
+setupGetStartedButton();
 
 // Handles messages events
 function handleMessage(sender_psid, received_message) {
     let response;
 
+    // Check if the message contains text
     if (received_message.text) {
         const userMessage = received_message.text.toLowerCase();
 
-        // Banking-related questions
-        if (userMessage.includes("loan")) {
+        // Add specific responses
+        if (userMessage === "hello" || userMessage === "hi") {
+            response = {
+                "text": `Hi there! Welcome to our Banking Chatbot. Here are some options you can ask about:
+1. Loans
+2. Account Services
+3. Bank Timings`
+            };
+        } else if (userMessage.includes("loan")) {
             response = {
                 "text": `We offer several types of loans:
 1. Personal Loan
 2. Home Loan
 3. Car Loan
 
-Please reply with the type of loan you're interested in to know more.`
-            };
-        } else if (userMessage.includes("personal loan")) {
-            response = {
-                "text": `Our Personal Loans offer flexible repayment options and competitive interest rates. The eligibility criteria include:
-- Minimum income: $3,000/month
-- Employment stability: 1 year
-
-Would you like to apply?`
-            };
-        } else if (userMessage.includes("home loan")) {
-            response = {
-                "text": `Our Home Loans provide up to 80% financing with interest rates starting at 5%. 
-
-Would you like to learn about the documents required?`
-            };
-        } else if (userMessage.includes("car loan")) {
-            response = {
-                "text": `Our Car Loans offer up to 90% financing on new cars and 80% on used cars. 
-
-Would you like to calculate your EMI (Equated Monthly Installment)?`
+Reply with the type of loan you're interested in!`
             };
         } else {
-            // Default response for unrecognized messages
+            // Default response
             response = {
                 "text": `I'm sorry, I didn't understand that. You can ask me about loans, account services, or bank timings.`
             };
@@ -136,7 +145,6 @@ Would you like to calculate your EMI (Equated Monthly Installment)?`
         }
     }
 
-
 // Sends the response message
     callSendAPI(sender_psid, response);
 
@@ -145,16 +153,27 @@ Would you like to calculate your EMI (Equated Monthly Installment)?`
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
     let response;
-
-    // Get the payload for the postback
+// Get the payload for the postback
     let payload = received_postback.payload;
 
-    // Set the response based on the postback payload
-    if (payload === 'yes') {
-        response = { "text": "Thanks!" }
+    // Handle the "Get Started" postback
+    if (payload === 'GET_STARTED') {
+        response = {
+            "text": `Welcome to our Banking Chatbot! Here are some options:
+1. Learn about Loans
+2. Check Account Services
+3. Bank Timings
+
+Please reply with the number of your choice.`
+        };
+    } else if (payload === 'yes') {
+        response = { "text": "Thanks!" };
     } else if (payload === 'no') {
-        response = { "text": "Oops, try sending another image." }
+        response = { "text": "Oops, try sending another image." };
+    } else {
+        response = { "text": "I'm sorry, I didn't understand that." };
     }
+
     // Send the message to acknowledge the postback
     callSendAPI(sender_psid, response);
 
